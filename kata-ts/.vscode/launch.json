@@ -5,12 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Node Inspector",
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "protocol": "inspector",
+      "args": ["${workspaceRoot}/src/main.ts"],
       "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/hw.ts"]
+      "runtimeExecutable": "/home/rem/.nvm/versions/node/v12.16.1/bin/node",
+      "protocol": "inspector",
+      "internalConsoleOptions": "openOnSessionStart"
     }
   ]
 }
