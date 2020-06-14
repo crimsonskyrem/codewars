@@ -10,7 +10,7 @@
       "request": "launch",
       "args": ["${workspaceRoot}/src/main.ts"],
       "runtimeArgs": ["-r", "ts-node/register"],
-      "runtimeExecutable": "/home/rem/.nvm/versions/node/v12.16.1/bin/node",
+      "runtimeExecutable": "/home/rem/.nvm/versions/node/v12.16.3/bin/node",
       "protocol": "inspector",
       "internalConsoleOptions": "openOnSessionStart"
     }
