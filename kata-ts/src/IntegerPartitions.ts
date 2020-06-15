@@ -1,65 +1,38 @@
-function prod(int: number) {
-  let arr: number[] = [];
-  for (let i = 1; i <= n; i++) {
-    arr.push(1);
-  }
+function prod(n: number) {
   let set: Set<number> = new Set();
-  let generated = splitArry(arr);
-  set.add(1);
+  function splitArry(n: number): number[][] {
+    if (n == 1) {
+      return [[1]];
+    } else {
+      let arr = splitArry(n - 1)
+      let merge = []
+      let lastItem = [...arr[arr.length - 1], 1]
+
+      arr.forEach((sub: number[], i) => {
+        let tmp = [...sub]
+        if (i > 0) {
+          for (let j = 0; j < sub.length; j++) {
+            let tmp2 = [...tmp]
+            tmp2[j] += 1
+            merge.push(tmp2)
+          }
+        } else {
+          tmp[i] += 1
+          merge.push(tmp)
+        }
+      })
+      merge.push(lastItem)
+      console.log(merge);
+      return merge;
+    }
+  }
+  let generated = splitArry(n);
 
   for (let i = 0; i < generated.length; i++) {
     let numb = generated[i].reduce((a, b) => a * b)
     set.add(numb);
   }
 
-  function splitArry(arr: number[]): number[][] {
-    let length = arr.length;
-    let exists: number[] = [];
-    if (length < 3) {
-      return [arr];
-    }
-    let res: number[][] = [];
-    for (let i = 1; i < length; i++) {
-      let tmp: number[] = [];
-      let copy = [...arr];
-      let rest = copy.splice(0, i);
-      if (rest.length > 1) {
-        let copyNum = copy.reduce((a, b) => a + b);
-        tmp.push(copyNum);
-        let restArr = splitArry([...rest]);
-        if (restArr.length > 0) {
-          restArr.forEach(sub => {
-            let tmparr = [...sub, copyNum];
-            if (chk(tmparr, exists)) {
-              res.push(tmparr);
-            }
-            let another = [...tmp];
-            another.push(sub.reduce((a, b) => a + b))
-            if (chk(another, exists)) {
-              res.push(another);
-            }
-          })
-        }
-      }
-
-      if (chk(tmp, exists)) {
-        res.push(tmp)
-      }
-    }
-    return res;
-  }
-  function chk(arr: number[], include: number[]): Boolean {
-    if (arr.length < 1) {
-      return false;
-    }
-    let production = arr.reduce((a, b) => a * b)
-    if (include.indexOf(production) > 0) {
-      return false;
-    } else {
-      include.push(production);
-      return true;
-    }
-  }
 
   let res: number[] = Array.from(set);
   res.sort((a, b) => a - b);
@@ -71,6 +44,6 @@ function prod(int: number) {
 
 
 function test() {
-  console.log(prod(8));
+  console.log(prod(9));
 }
 export { test };
