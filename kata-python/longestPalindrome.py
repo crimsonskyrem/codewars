@@ -1,31 +1,35 @@
 def longestPalindrome(s: str) -> str:
-        l = len(s)
-        if l == 1:
-            return s
-        res = ''
-        tmp = ''
-        s_l = len(s)
-        tail = 0
-        repeat = False
-        reverse = s[::-1]
-        for i in range(s_l):
-            if reverse[i] == s[0]:
-                tail = s_l - i
-                repeat = True
-                break
-        if not repeat:
-            return ''
-        tmp = s[:tail]
-        tmp_l = len(tmp)
-        mid = tmp_l // 2 
-        single = tmp_l % 2
-        if tmp[mid:][::-1] == tmp[:mid + single]:
-            res = tmp
-        else:
-            tmp2 = longestPalindrome(s[1:])
-            if len(res) < len(tmp2):
-                res = tmp2
-        return res
+    l = len(s)
+    if l == 1:
+        return s
+    res = s[0]
+    tmp = ''
+    middle = True
+    p = 1
+    left = 0
+    right = 0
+    while p < l:
+        left = p - 1
+        if middle :
+            right = p
+        elif p+1 < l:
+            right = p + 1
+        if s[left] == s[right]:
+            tmp = s[left:right + 1]
+            for _ in range(1,l - p):
+                left -=1
+                right += 1
+                if left>=0 and right<l and s[left] == s[right]:
+                    tmp = s[left:right + 1]
+                else:
+                    break
+            if len(tmp) > len(res):
+                res =tmp
+        if not middle:
+            p += 1
+        middle = not middle
+    return res
 
-print(longestPalindrome('cbbdbb'))
+print(longestPalindrome('bb'))
+# print(longestPalindrome('cbbdbb'))
 # print(longestPalindrome("abbcccbbbcaaccbababcbcabca"))
