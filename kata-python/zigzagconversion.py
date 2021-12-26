@@ -44,13 +44,11 @@ def convert2(s: str, numRows: int) -> str:
         for i in range(1,end):
             tmp1 = list(s[i::split])
             tmp2 = list(s[split - i::split])
-            myzip = []
             while tmp1 or tmp2:
                 if tmp1:
-                    myzip.append(tmp1.pop(0))
+                    first += tmp1.pop(0)
                 if tmp2:
-                    myzip.append(tmp2.pop(0))
-            first += ''.join(myzip)
+                    first += tmp2.pop(0)
         return first + last
 
 T = convert2("PAYPALISHIRING", 3)
