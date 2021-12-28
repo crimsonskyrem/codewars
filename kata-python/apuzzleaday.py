@@ -1,5 +1,8 @@
 from datetime import date
-LOCK_STRING = 'X'
+from functools import reduce
+import numpy as np
+LOCK = 1
+EMPT = 0
 board = [
     ["JAN","FEB","MAR","APR","MAY","JUN"],
     ["JUL","AUG","SEP","OCT","NOV","DEC"],
@@ -12,67 +15,72 @@ board = [
     [" "  ," "  ,"THU","FRI","SAT","SUN"]
 ]
 bk1 = [
-    [1,0,0],
-    [1,1,1],
-    [1,0,0],
-    [1,0,0]
+    [LOCK,EMPT,EMPT],
+    [LOCK,LOCK,LOCK],
+    [LOCK,EMPT,EMPT],
+    [LOCK,EMPT,EMPT]
 ]
 bk2 = [
-    [1,0],
-    [1,1],
-    [1,0],
-    [1,0],
-    [1,0]
+    [LOCK,EMPT],
+    [LOCK,LOCK],
+    [LOCK,EMPT],
+    [LOCK,EMPT],
+    [LOCK,EMPT]
 ]
 bk3 = [
-    [1,1],
-    [1,0],
-    [1,0],
-    [1,0]
+    [LOCK,LOCK],
+    [LOCK,EMPT],
+    [LOCK,EMPT],
+    [LOCK,EMPT]
 ]
 bk4 = [
-    [1,1],
-    [1,0],
-    [1,0],
-    [1,0],
-    [1,0]
+    [LOCK,LOCK],
+    [LOCK,EMPT],
+    [LOCK,EMPT],
+    [LOCK,EMPT],
+    [LOCK,EMPT]
 ]
 bk5 = [
-    [1,1,1],
-    [1,0,0],
-    [1,0,0],
-    [1,0,0]
+    [LOCK,LOCK,LOCK],
+    [LOCK,EMPT,EMPT],
+    [LOCK,EMPT,EMPT],
+    [LOCK,EMPT,EMPT]
 ]
 bk6 = [
-    [1,0],
-    [1,1],
-    [0,1],
-    [0,1]
+    [LOCK,EMPT],
+    [LOCK,LOCK],
+    [EMPT,LOCK],
+    [EMPT,LOCK]
 ]
 bk7 = [
-    [1,0,1],
-    [1,1,1],
-    [1,0,0]
+    [LOCK,EMPT,LOCK],
+    [LOCK,LOCK,LOCK],
+    [LOCK,EMPT,EMPT]
 ]
 bk8 = [
-    [1,0,0],
-    [1,1,1],
-    [0,1,0],
-    [0,1,0]
+    [LOCK,EMPT,EMPT],
+    [LOCK,LOCK,LOCK],
+    [EMPT,LOCK,EMPT],
+    [EMPT,LOCK,EMPT]
 ]
 bk9 = [
-    [1,0],
-    [1,1],
-    [1,1]
+    [LOCK,EMPT],
+    [LOCK,LOCK],
+    [LOCK,LOCK]
 ]
 
 def rotate(bk, times= 0):
-    res = bk
+    res = np.array(bk)
     if times < 0:
-        res = list(map(lambda x:x[::-1],res))
+        res = np.fliplr(res)
         times += 1
-    for _ in range(abs(times)):
-        res = list(zip(*res[::-1]))
+    res = np.rot90(res,abs(times))
+    return res
+
+def position(bk,x,y):
+    res = np.array(bk)
+    row,column = res.shape
+    res = np.pad(res,((x,9-row-x),(y,6-y-column)))
     return res
 
 def printBk(bk):
@@ -83,23 +91,32 @@ def printBk(bk):
 
 def markDateBoard():
     today = date.today()
-    nboard = board
-    weekday = today.weekday()
-    for i in range(9):
-        for j in range(6):
-            if i < 2 and j + i*6 == today.month - 1:
-                nboard[i][j] = LOCK_STRING
-            if i > 1 and i < 8 and  j + (i-2)*6 == today.day - 1:
-                nboard[i][j] = LOCK_STRING
-            if i == 7 and weekday < 4 and j - 3 == weekday:
-                nboard[i][j] = LOCK_STRING
-            if i == 8 and weekday > 3 and j + 1 == weekday:
-                nboard[i][j] = LOCK_STRING
+    nboard = np.zeros((9,6),np.int8)
+    wdpos = [[7,3],[7,4],[7,5],[8,2],[8,3],[8,4],[8,5]]
+    nboard[(today.month - 1) // 6][(today.month - 1) % 6] = LOCK
+    nboard[(today.day - 1) // 6 + 2][(today.day - 1) % 6] = LOCK
+    i,j = wdpos[today.weekday()]
+    nboard[i][j] = LOCK
     return nboard
+
+def overLay(currBoard):
+    p = np.where(currBoard > LOCK)
+    return currBoard[p].size == 0
+
+def fullFill(currBoard):
+    p = np.where(currBoard == LOCK)
+    return currBoard[p].size == 54
 
 def plot():
     pass
 def main():
     pass
 
-# printBk(rotate(bk2,-2))
+curr = markDateBoard()
+print(curr)
+print(fullFill(curr))
+# nbk1 = position(rotate(bk1,EMPT),EMPT,EMPT)
+# test = np.add(curr,nbk1)
+# print(test)
+# print(test[LOCK,4])
+# printBk(rotate(bk1,EMPT))
