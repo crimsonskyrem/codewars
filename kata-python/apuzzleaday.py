@@ -1,5 +1,4 @@
 from datetime import date
-from functools import reduce
 import numpy as np
 LOCK = 1
 EMPT = 0
@@ -99,24 +98,35 @@ def markDateBoard():
     nboard[i][j] = LOCK
     return nboard
 
-def overLay(currBoard):
+def notOverLay(currBoard):
     p = np.where(currBoard > LOCK)
     return currBoard[p].size == 0
 
-def fullFill(currBoard):
+def isFullFill(currBoard):
     p = np.where(currBoard == LOCK)
     return currBoard[p].size == 54
 
+def placeBlock(currBoard, blk):
+    for i in range(9):
+        for j in range(6):
+            row,column = blk.shape
+            if row + i < 9 and column + j < 6:
+                curr = np.add(currBoard,position(blk,i,j))
+                if notOverLay(curr):
+                    return True,curr
+    return False,currBoard
+
 def plot():
     pass
-def main():
-    pass
 
-curr = markDateBoard()
-print(curr)
-print(fullFill(curr))
-# nbk1 = position(rotate(bk1,EMPT),EMPT,EMPT)
-# test = np.add(curr,nbk1)
-# print(test)
-# print(test[LOCK,4])
-# printBk(rotate(bk1,EMPT))
+def main():
+    blocks = [bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9]
+    curr = markDateBoard()
+    for b in blocks:
+        nblk = rotate(b,0)
+        succ,curr = placeBlock(curr,nblk)
+        if not succ:
+            break
+        print(curr)
+
+main()
