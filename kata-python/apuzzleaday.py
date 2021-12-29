@@ -1,4 +1,5 @@
 from datetime import date
+from os import system,name
 import numpy as np
 LOCK = 1
 EMPT = 0
@@ -82,6 +83,14 @@ def position(bk,x,y):
     res = np.pad(res,((x,9-row-x),(y,6-y-column)))
     return res
 
+def clear():
+    # for windows
+    if name == 'nt':
+        _ = system('cls')
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+
 def printBk(bk):
     for i in bk:
         for j in i:
@@ -98,35 +107,81 @@ def markDateBoard():
     nboard[i][j] = LOCK
     return nboard
 
-def notOverLay(currBoard):
+def validBoard(currBoard):
+    if np.array_equal(currBoard[0:2,0:2],[[0,1],[1,1]]):
+        return False
+    if np.array_equal(currBoard[0:2,4:6],[[1,0],[1,1]]):
+        return False
+    if np.array_equal(currBoard[0:2,0:3],[[0,0,1],[1,1,1]]):
+        return False
+    if np.array_equal(currBoard[0:2,3:6],[[1,0,0],[1,1,1]]):
+        return False
+    if np.array_equal(currBoard[7:9,0:2],[[1,1],[0,1]]):
+        return False
+    if np.array_equal(currBoard[7:9,4:6],[[1,1],[1,0]]):
+        return False
+    if np.array_equal(currBoard[7:9,0:3],[[1,1,1],[0,0,1]]):
+        return False
+    if np.array_equal(currBoard[7:9,3:6],[[1,1,1],[1,0,0]]):
+        return False
+ 
     p = np.where(currBoard > LOCK)
-    return currBoard[p].size == 0
+    if currBoard[p].size == 0:
+        return True
+    return False
 
 def isFullFill(currBoard):
     p = np.where(currBoard == LOCK)
     return currBoard[p].size == 54
 
 def placeBlock(currBoard, blk):
+    blk = np.array(blk)
     for i in range(9):
         for j in range(6):
             row,column = blk.shape
             if row + i < 9 and column + j < 6:
-                curr = np.add(currBoard,position(blk,i,j))
-                if notOverLay(curr):
-                    return True,curr
-    return False,currBoard
+                posBlk = position(blk,i,j)
+                curr = np.add(currBoard,posBlk)
+                if validBoard(curr):
+                    clear()
+                    print(curr)
+                    return True,curr,posBlk
+    return False,currBoard,blk
+
+def enumFill(currBoard,leftBlk,placedBlk):
+    curr = currBoard
+    lefts = leftBlk
+    placed = placedBlk
+    if lefts.size == 0:
+        return True,curr,lefts,placed
+    for i in range(-5,5):
+        for j in range(lefts.size):
+            chk1,curr1,pos1 = placeBlock(curr,rotate(lefts[j],i))
+            if chk1:
+                lefts1 = np.delete(lefts,j)
+                placed1 = np.append(placed,pos1)
+                chk2,curr2,lefts2,placed2 = enumFill(curr1,lefts1,placed1)
+                if chk2:
+                    return True,curr2,lefts2,placed2
+    return False,curr,lefts,placed
 
 def plot():
     pass
 
 def main():
-    blocks = [bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9]
-    curr = markDateBoard()
-    for b in blocks:
-        nblk = rotate(b,0)
-        succ,curr = placeBlock(curr,nblk)
-        if not succ:
-            break
+    blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
+    board = markDateBoard()
+    placedBlocks = np.array([])
+    chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
+    if chk:
+        clear()
         print(curr)
+        print(placed)
+
+def test():
+    board = markDateBoard()
+    print(board[7:9,4:6])
+    # print(np.array_equal(board[0:2,4:2],[[0,0],[0,1]]))
 
 main()
+# test()
