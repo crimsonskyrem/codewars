@@ -117,6 +117,7 @@ def validBoard(currBoard):
         if currBoard[fullfill].size > 21:
             fillrows = (currBoard[fullfill].size - 3) // 6 - 1
             if np.array_equal(currBoard[0,fillrows],np.ones((fillrows,6),dtype=np.int8)):
+                log(currBoard)
                 return True
         else:
             return True
@@ -138,6 +139,7 @@ def placeBlock(currBoard, blk):
                 if validBoard(curr):
                     clear()
                     print(curr)
+                    print(blk)
                     return True,curr,posBlk
     return False,currBoard,blk
 
@@ -167,12 +169,19 @@ def log(arr):
     f = open(FILE_NAME, "a")
     f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
     f.write('\n')
-    f.write(np.array2string(arr))
+    if type(arr) == list:
+        for i in arr:
+            tmp = np.array(i)
+            f.write(np.array2string(tmp))
+            f.write('\n')
+    else:
+        f.write(np.array2string(arr))
+
     f.write('\n')
     f.close()
 
 def main():
-    blocks = [bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9]
+    blocks = [bk3,bk2,bk4,bk1,bk5,bk6,bk7,bk8,bk9]
     board = markDateBoard()
     log(board)
     placedBlocks = []
@@ -181,21 +190,12 @@ def main():
         clear()
         print(lefts)
         print(curr)
-        for i in placed:
-            log(i)
+        log(placed)
 
 
 def test():
-    blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
-    # board = markDateBoard()
-    placedBlocks = np.array([],dtype='object')
-    blks = position(blocks[0],0,0)
-    placedBlocks = np.append(placedBlocks,blks)
-    blks = position(blocks[1],0,0)
-    placedBlocks = np.append(placedBlocks,blks)
-    # print(board[7:9,4:6])
-    log(placedBlocks)
-    # print(np.array_equal(board[0:2,4:2],[[0,0],[0,1]]))
+    blocks = [bk3,bk2,bk4,bk1,bk5,bk6,bk7,bk8,bk9]
+    log(blocks)
 
 main()
 # test()
