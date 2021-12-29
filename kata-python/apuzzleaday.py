@@ -1,8 +1,9 @@
-from datetime import date
+from datetime import date,datetime
 from os import system,name
 import numpy as np
 LOCK = 1
 EMPT = 0
+FILE_NAME = 'logfile.txt'
 board = [
     ["JAN","FEB","MAR","APR","MAY","JUN"],
     ["JUL","AUG","SEP","OCT","NOV","DEC"],
@@ -116,15 +117,6 @@ def validBoard(currBoard):
         return False
     if np.array_equal(currBoard[0:2,3:6],[[1,0,0],[1,1,1]]):
         return False
-    if np.array_equal(currBoard[7:9,0:2],[[1,1],[0,1]]):
-        return False
-    if np.array_equal(currBoard[7:9,4:6],[[1,1],[1,0]]):
-        return False
-    if np.array_equal(currBoard[7:9,0:3],[[1,1,1],[0,0,1]]):
-        return False
-    if np.array_equal(currBoard[7:9,3:6],[[1,1,1],[1,0,0]]):
-        return False
- 
     p = np.where(currBoard > LOCK)
     if currBoard[p].size == 0:
         return True
@@ -168,19 +160,34 @@ def enumFill(currBoard,leftBlk,placedBlk):
 def plot():
     pass
 
+def log(arr):
+    f = open(FILE_NAME, "a")
+    f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    f.write('\n')
+    f.write(np.array2string(arr))
+    f.write('\n')
+    f.close()
+
 def main():
     blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
     board = markDateBoard()
+    log(board)
     placedBlocks = np.array([])
     chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
     if chk:
         clear()
+        print(lefts)
         print(curr)
-        print(placed)
+        log(placed)
+
 
 def test():
+    blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
     board = markDateBoard()
-    print(board[7:9,4:6])
+    placedBlocks = np.array([])
+    placedBlocks = np.append(placedBlocks,blocks[0])
+    # print(board[7:9,4:6])
+    log(placedBlocks)
     # print(np.array_equal(board[0:2,4:2],[[0,0],[0,1]]))
 
 main()
