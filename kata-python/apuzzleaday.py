@@ -115,8 +115,8 @@ def validBoard(currBoard):
     if currBoard[overlay].size == 0:
         fullfill = np.where(currBoard == LOCK)
         if currBoard[fullfill].size > 21:
-            fillrows = (currBoard[fullfill].size - 3) // 6 - 1
-            if np.array_equal(currBoard[0,fillrows],np.ones((fillrows,6),dtype=np.int8)):
+            fillrows = (currBoard[fullfill].size - 3) // 6 - 2
+            if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 log(currBoard)
                 return True
         else:
