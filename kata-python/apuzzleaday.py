@@ -109,11 +109,13 @@ def markDateBoard():
     return nboard
 
 def validBoard(currBoard):
+    if currBoard[0][0] == EMPT:
+        return False
     overlay = np.where(currBoard > LOCK)
     if currBoard[overlay].size == 0:
         fullfill = np.where(currBoard == LOCK)
-        if currBoard[fullfill].size > 16:
-            fillrows = (currBoard[fullfill].size - 3) // 6
+        if currBoard[fullfill].size > 21:
+            fillrows = (currBoard[fullfill].size - 3) // 6 - 1
             if np.array_equal(currBoard[0,fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 return True
         else:
@@ -143,14 +145,16 @@ def enumFill(currBoard,leftBlk,placedBlk):
     curr = currBoard
     lefts = leftBlk
     placed = placedBlk
-    if lefts.size == 0:
+    if len(lefts) == 0:
         return True,curr,lefts,placed
-    for i in range(-5,5):
-        for j in range(lefts.size):
+    for j in range(len(lefts)):
+        for i in range(-5,5):
             chk1,curr1,pos1 = placeBlock(curr,rotate(lefts[j],i))
             if chk1:
-                lefts1 = np.delete(lefts,j)
-                placed1 = np.append(placed,pos1)
+                lefts1 = lefts.copy()
+                lefts1.pop(j)
+                placed1 = placed.copy()
+                placed1.append(pos1)
                 chk2,curr2,lefts2,placed2 = enumFill(curr1,lefts1,placed1)
                 if chk2:
                     return True,curr2,lefts2,placed2
@@ -168,23 +172,27 @@ def log(arr):
     f.close()
 
 def main():
-    blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
+    blocks = [bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9]
     board = markDateBoard()
     log(board)
-    placedBlocks = np.array([])
+    placedBlocks = []
     chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
     if chk:
         clear()
         print(lefts)
         print(curr)
-        log(placed)
+        for i in placed:
+            log(i)
 
 
 def test():
     blocks = np.array([bk1,bk2,bk3,bk4,bk5,bk6,bk7,bk8,bk9],dtype='object')
-    board = markDateBoard()
-    placedBlocks = np.array([])
-    placedBlocks = np.append(placedBlocks,blocks[0])
+    # board = markDateBoard()
+    placedBlocks = np.array([],dtype='object')
+    blks = position(blocks[0],0,0)
+    placedBlocks = np.append(placedBlocks,blks)
+    blks = position(blocks[1],0,0)
+    placedBlocks = np.append(placedBlocks,blks)
     # print(board[7:9,4:6])
     log(placedBlocks)
     # print(np.array_equal(board[0:2,4:2],[[0,0],[0,1]]))
