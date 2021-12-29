@@ -114,8 +114,8 @@ def validBoard(currBoard):
     overlay = np.where(currBoard > LOCK)
     if currBoard[overlay].size == 0:
         fullfill = np.where(currBoard == LOCK)
-        if currBoard[fullfill].size > 21:
-            fillrows = (currBoard[fullfill].size - 3) // 6 - 2
+        if currBoard[fullfill].size > 23:
+            fillrows = (currBoard[fullfill].size) // 12 
             if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 log(currBoard)
                 return True
@@ -139,7 +139,6 @@ def placeBlock(currBoard, blk):
                 if validBoard(curr):
                     clear()
                     print(curr)
-                    print(blk)
                     return True,curr,posBlk
     return False,currBoard,blk
 
@@ -188,7 +187,6 @@ def main():
     chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
     if chk:
         clear()
-        print(lefts)
         print(curr)
         log(placed)
 
