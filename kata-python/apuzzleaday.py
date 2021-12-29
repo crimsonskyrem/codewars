@@ -109,17 +109,16 @@ def markDateBoard():
     return nboard
 
 def validBoard(currBoard):
-    if np.array_equal(currBoard[0:2,0:2],[[0,1],[1,1]]):
-        return False
-    if np.array_equal(currBoard[0:2,4:6],[[1,0],[1,1]]):
-        return False
-    if np.array_equal(currBoard[0:2,0:3],[[0,0,1],[1,1,1]]):
-        return False
-    if np.array_equal(currBoard[0:2,3:6],[[1,0,0],[1,1,1]]):
-        return False
-    p = np.where(currBoard > LOCK)
-    if currBoard[p].size == 0:
-        return True
+    overlay = np.where(currBoard > LOCK)
+    if currBoard[overlay].size == 0:
+        fullfill = np.where(currBoard == LOCK)
+        if currBoard[fullfill].size > 16:
+            fillrows = (currBoard[fullfill].size - 3) // 6
+            if np.array_equal(currBoard[0,fillrows],np.ones((fillrows,6),dtype=np.int8)):
+                return True
+        else:
+            return True
+
     return False
 
 def isFullFill(currBoard):
