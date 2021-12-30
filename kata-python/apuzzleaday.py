@@ -114,8 +114,8 @@ def validBoard(currBoard):
     overlay = np.where(currBoard > LOCK)
     if currBoard[overlay].size == 0:
         fullfill = np.where(currBoard == LOCK)
-        if currBoard[fullfill].size > 23:
-            fillrows = (currBoard[fullfill].size) // 12 
+        if currBoard[fullfill].size > 21:
+            fillrows = (currBoard[fullfill].size) // 8 
             if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 log(currBoard)
                 return True
@@ -133,7 +133,7 @@ def placeBlock(currBoard, blk):
     for i in range(9):
         for j in range(6):
             row,column = blk.shape
-            if row + i < 9 and column + j < 6:
+            if row + i < 10 and column + j < 7:
                 posBlk = position(blk,i,j)
                 curr = np.add(currBoard,posBlk)
                 if validBoard(curr):
@@ -180,7 +180,7 @@ def log(arr):
     f.close()
 
 def main():
-    blocks = [bk3,bk2,bk4,bk1,bk5,bk6,bk7,bk8,bk9]
+    blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
     board = markDateBoard()
     log(board)
     placedBlocks = []
@@ -192,8 +192,27 @@ def main():
 
 
 def test():
-    blocks = [bk3,bk2,bk4,bk1,bk5,bk6,bk7,bk8,bk9]
-    log(blocks)
+    blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
+    ans = []
+    board = markDateBoard()
+    tmp = rotate(blocks[0],1)
+    chk1,curr1,pos1 = placeBlock(board,tmp)
+    ans.append(pos1)
+    tmp = rotate(blocks[1],3)
+    chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    ans.append(pos1)
+    tmp = rotate(blocks[2],-2)
+    chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    ans.append(pos1)
+    tmp = rotate(blocks[4],-1)
+    chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    ans.append(pos1)
+    tmp = rotate(blocks[3],-2)
+    chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    ans.append(pos1)
+    # tmp = rotate(blocks[4],-1)
+    print(tmp)
+    log(ans)
 
 main()
 # test()
