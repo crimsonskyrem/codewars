@@ -1,8 +1,12 @@
 from datetime import date,datetime
+from PIL import Image, ImageDraw, ImageFont
 from os import system,name
 import numpy as np
 LOCK = 1
 EMPT = 0
+BLK_EDGE = 10
+BOARD_HEIGHT = 9
+BOARD_WIDTH = 6
 FILE_NAME = 'logfile.txt'
 board = [
     ["JAN","FEB","MAR","APR","MAY","JUN"],
@@ -101,11 +105,11 @@ def printBk(bk):
 def markDateBoard(daystr = ''):
     today = date.today()
     if daystr:
-        today =  datetime.strptime(daystr, '%Y-%m-%d')
-    nboard = np.zeros((9,6),np.int8)
+        today = datetime.strptime(daystr, '%Y-%m-%d')
+    nboard = np.zeros((BOARD_HEIGHT,BOARD_WIDTH),np.int8)
     wdpos = [[7,3],[7,4],[7,5],[8,2],[8,3],[8,4],[8,5]]
-    nboard[(today.month - 1) // 6][(today.month - 1) % 6] = LOCK
-    nboard[(today.day - 1) // 6 + 2][(today.day - 1) % 6] = LOCK
+    nboard[(today.month - 1) // BOARD_WIDTH][(today.month - 1) % BOARD_WIDTH] = LOCK
+    nboard[(today.day - 1) // BOARD_WIDTH + 2][(today.day - 1) % BOARD_WIDTH] = LOCK
     i,j = wdpos[today.weekday()]
     nboard[i][j] = LOCK
     return nboard
@@ -126,8 +130,8 @@ def validBoard(currBoard):
 
 def placeBlock(currBoard, blk):
     blk = np.array(blk)
-    for i in range(9):
-        for j in range(6):
+    for i in range(BOARD_HEIGHT):
+        for j in range(BOARD_WIDTH):
             row,column = blk.shape
             if row + i < 10 and column + j < 7:
                 posBlk = position(blk,i,j)
@@ -144,12 +148,12 @@ def enumFill(currBoard,leftBlk,placedBlk):
     placed = placedBlk
     if len(lefts) == 0:
         return True,curr,lefts,placed
-    for j in range(len(lefts)):
-        for i in range(-5,5):
-            chk1,curr1,pos1 = placeBlock(curr,rotate(lefts[j],i))
+    for i in range(len(lefts)):
+        for j in range(-5,5):
+            chk1,curr1,pos1 = placeBlock(curr,rotate(lefts[i],j))
             if chk1:
                 lefts1 = lefts.copy()
-                lefts1.pop(j)
+                lefts1.pop(i)
                 placed1 = placed.copy()
                 placed1.append(pos1)
                 chk2,curr2,lefts2,placed2 = enumFill(curr1,lefts1,placed1)
@@ -158,11 +162,17 @@ def enumFill(currBoard,leftBlk,placedBlk):
     return False,curr,lefts,placed
 
 def plot():
-    pass
+    bgHeight = BLK_EDGE * BOARD_HEIGHT
+    bgWidth = BLK_EDGE * BOARD_WIDTH
+    bg = Image.new("RGB", (bgHeight, bgWidth), (128, 128, 128))
+    draw = ImageDraw.Draw(bg)
+    draw.rectangle((0, 0, 10, 10), fill=(0, 255, 0))
+    draw.multiline_text((0, 0), 'Pillow sample', fill=(0, 0, 0))
+    bg.save('./' + datetime.now().strftime("%Y-%m-%d") + '.png')
 
 def log(arr):
     f = open(FILE_NAME, "a")
-    f.write(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+    f.write(datetime.now().strftime("%Y-%m-%d, %H:%M:%S"))
     f.write('\n')
     if type(arr) == list:
         for i in arr:
@@ -188,27 +198,28 @@ def main():
 
 
 def test():
-    blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
-    ans = []
-    board = markDateBoard('2021-12-29')
-    tmp = rotate(blocks[0],1)
-    chk1,curr1,pos1 = placeBlock(board,tmp)
-    ans.append(pos1)
-    tmp = rotate(blocks[1],3)
-    chk1,curr1,pos1 = placeBlock(curr1,tmp)
-    ans.append(pos1)
-    tmp = rotate(blocks[2],-2)
-    chk1,curr1,pos1 = placeBlock(curr1,tmp)
-    ans.append(pos1)
-    tmp = rotate(blocks[4],-1)
-    chk1,curr1,pos1 = placeBlock(curr1,tmp)
-    ans.append(pos1)
-    tmp = rotate(blocks[3],-2)
-    chk1,curr1,pos1 = placeBlock(curr1,tmp)
-    ans.append(pos1)
+    # blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
+    # ans = []
+    # board = markDateBoard('2021-12-29')
+    # tmp = rotate(blocks[0],1)
+    # chk1,curr1,pos1 = placeBlock(board,tmp)
+    # ans.append(pos1)
+    # tmp = rotate(blocks[1],3)
+    # chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    # ans.append(pos1)
+    # tmp = rotate(blocks[2],-2)
+    # chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    # ans.append(pos1)
     # tmp = rotate(blocks[4],-1)
-    print(tmp)
-    log(ans)
+    # chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    # ans.append(pos1)
+    # tmp = rotate(blocks[3],-2)
+    # chk1,curr1,pos1 = placeBlock(curr1,tmp)
+    # ans.append(pos1)
+    # tmp = rotate(blocks[4],-1)
+    # print(tmp)
+    # log(ans)
+    plot()
 
 # main()
 test()
