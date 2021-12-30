@@ -1,5 +1,4 @@
 from datetime import date,datetime
-from PIL import Image, ImageDraw, ImageFont
 from os import system,name
 import numpy as np
 LOCK = 1
@@ -8,6 +7,7 @@ BLK_EDGE = 10
 BOARD_HEIGHT = 9
 BOARD_WIDTH = 6
 FILE_NAME = 'logfile.txt'
+
 board = [
     ["JAN","FEB","MAR","APR","MAY","JUN"],
     ["JUL","AUG","SEP","OCT","NOV","DEC"],
@@ -19,6 +19,7 @@ board = [
     ["31" ," "  ," "  ,"MON","TUE","WED"],
     [" "  ," "  ,"THU","FRI","SAT","SUN"]
 ]
+force_check = 0
 bk1 = [
     [LOCK,EMPT,EMPT],
     [LOCK,LOCK,LOCK],
@@ -106,6 +107,8 @@ def markDateBoard(daystr = ''):
     today = date.today()
     if daystr:
         today = datetime.strptime(daystr, '%Y-%m-%d')
+    if today.month == 1:
+        force_check = 1
     nboard = np.zeros((BOARD_HEIGHT,BOARD_WIDTH),np.int8)
     wdpos = [[7,3],[7,4],[7,5],[8,2],[8,3],[8,4],[8,5]]
     nboard[(today.month - 1) // BOARD_WIDTH][(today.month - 1) % BOARD_WIDTH] = LOCK
@@ -115,8 +118,6 @@ def markDateBoard(daystr = ''):
     return nboard
 
 def validBoard(currBoard):
-    if currBoard[0][0] == EMPT:
-        return False
     if np.max(currBoard) == LOCK:
         fullfill = np.where(currBoard == LOCK)
         if currBoard[fullfill].size > 21:
@@ -124,8 +125,7 @@ def validBoard(currBoard):
             if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 return True
         else:
-            return True
-
+            return currBoard[0][force_check] == EMPT
     return False
 
 def placeBlock(currBoard, blk):
@@ -161,14 +161,15 @@ def enumFill(currBoard,leftBlk,placedBlk):
                     return True,curr2,lefts2,placed2
     return False,curr,lefts,placed
 
-def plot():
-    bgHeight = BLK_EDGE * BOARD_HEIGHT
-    bgWidth = BLK_EDGE * BOARD_WIDTH
-    bg = Image.new("RGB", (bgHeight, bgWidth), (128, 128, 128))
-    draw = ImageDraw.Draw(bg)
-    draw.rectangle((0, 0, 10, 10), fill=(0, 255, 0))
-    draw.multiline_text((0, 0), 'Pillow sample', fill=(0, 0, 0))
-    bg.save('./' + datetime.now().strftime("%Y-%m-%d") + '.png')
+def plot(ans):
+    resBoard = np.zeros((BOARD_HEIGHT,BOARD_WIDTH),np.int8)
+    num = 1
+    for blk in ans:
+        resBoard = np.add(resBoard,blk * num)
+        num += 1
+    log(resBoard)
+    print(resBoard)
+
 
 def log(arr):
     f = open(FILE_NAME, "a")
@@ -193,11 +194,11 @@ def main():
     chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
     if chk:
         clear()
-        print(curr)
-        log(placed)
+        plot(placed)
 
 
 def test():
+    pass
     # blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
     # ans = []
     # board = markDateBoard('2021-12-29')
@@ -219,7 +220,7 @@ def test():
     # tmp = rotate(blocks[4],-1)
     # print(tmp)
     # log(ans)
-    plot()
+    # plot(ans)
 
-# main()
-test()
+main()
+# test()
