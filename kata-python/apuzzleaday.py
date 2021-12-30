@@ -98,8 +98,10 @@ def printBk(bk):
             print(j,end=" ")
         print()
 
-def markDateBoard():
+def markDateBoard(daystr = ''):
     today = date.today()
+    if daystr:
+        today =  datetime.strptime(daystr, '%Y-%m-%d')
     nboard = np.zeros((9,6),np.int8)
     wdpos = [[7,3],[7,4],[7,5],[8,2],[8,3],[8,4],[8,5]]
     nboard[(today.month - 1) // 6][(today.month - 1) % 6] = LOCK
@@ -111,22 +113,16 @@ def markDateBoard():
 def validBoard(currBoard):
     if currBoard[0][0] == EMPT:
         return False
-    overlay = np.where(currBoard > LOCK)
-    if currBoard[overlay].size == 0:
+    if np.max(currBoard) == LOCK:
         fullfill = np.where(currBoard == LOCK)
         if currBoard[fullfill].size > 21:
             fillrows = (currBoard[fullfill].size) // 8 
             if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
-                log(currBoard)
                 return True
         else:
             return True
 
     return False
-
-def isFullFill(currBoard):
-    p = np.where(currBoard == LOCK)
-    return currBoard[p].size == 54
 
 def placeBlock(currBoard, blk):
     blk = np.array(blk)
@@ -194,7 +190,7 @@ def main():
 def test():
     blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
     ans = []
-    board = markDateBoard()
+    board = markDateBoard('2021-12-29')
     tmp = rotate(blocks[0],1)
     chk1,curr1,pos1 = placeBlock(board,tmp)
     ans.append(pos1)
@@ -214,5 +210,5 @@ def test():
     print(tmp)
     log(ans)
 
-main()
-# test()
+# main()
+test()
