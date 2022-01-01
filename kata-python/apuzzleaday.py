@@ -108,6 +108,7 @@ def markDateBoard(daystr = ''):
     if daystr:
         today = datetime.strptime(daystr, '%Y-%m-%d')
     if today.month == 1:
+        global force_check
         force_check = 1
     nboard = np.zeros((BOARD_HEIGHT,BOARD_WIDTH),np.int8)
     wdpos = [[7,3],[7,4],[7,5],[8,2],[8,3],[8,4],[8,5]]
@@ -125,7 +126,8 @@ def validBoard(currBoard):
             if np.array_equal(currBoard[0:fillrows],np.ones((fillrows,6),dtype=np.int8)):
                 return True
         else:
-            return currBoard[0][force_check] == EMPT
+            global force_check
+            return currBoard[0][force_check] == LOCK
     return False
 
 def placeBlock(currBoard, blk):
