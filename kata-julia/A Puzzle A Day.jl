@@ -59,6 +59,8 @@ bk9 = [
     LOCK LOCK
 ]
 
+force_check = 0
+
 function markDateBoard()
     date = Dates.now()
     nboard = zeros(Int8, BOARD_HEIGHT, BOARD_WIDTH)
@@ -67,6 +69,9 @@ function markDateBoard()
         nboard[2,Dates.month(date) - BOARD_WIDTH] = LOCK
     else
         nboard[1,Dates.month(date)] = LOCK
+    end
+    if Dates.month(date) == 1
+        global force_check = 1
     end
     r, c = divrem(Dates.day(date), BOARD_WIDTH)
     nboard[r + 3,c] = LOCK
@@ -99,18 +104,16 @@ end
 
 function validBoard(currBoard)
     if maximum(currBoard) == LOCK
-        # fullfill = np.where(currBoard == LOCK)
-        # if currBoard[fullfill].size > 21
-        #     fillrows = (currBoard[fullfill].size) // 8 
-        #     if currBoard[0:fillrows],ones(Int8,fillrows,6)
-        #         return True
-        #     end
-        # else
-        #     global force_check
-        #     return currBoard[0][force_check] == LOCK
-        # end
+        fullfill = filter(x -> x == LOCK,currBoard)
+        if length(fullfill) > 21
+            fillrows = fdiv(length(fullfill), 8) 
+            return all(currBoard[1:fillrows,:] .== LOCK)
+        else
+            global force_check
+            return currBoard[1,force_check] == LOCK
+        end
     end
-    return False
+    return false
 end
 
 
@@ -120,19 +123,54 @@ function placeBlock(currBoard, blk)
             row,column = size(blk)
             if row + i < 10 && column + j < 7
                 posBlk = pos(blk,i,j)
-                curr = broadcast(+,currBoard,posBlk)
+                curr = (+).(currBoard,posBlk)
                 if validBoard(curr)
-                    clearconsole()
+                    run(`clear`)
                     display(curr)
-                    return True,curr,posBlk
+                    return true,curr,posBlk
                 end
             end
         end
     end
-    return False,currBoard,blk
+    return false,currBoard,blk
 end
-board = markDateBoard()
-# display(board)
+
+
+function enumFill(currBoard,leftBlk,placedBlk)
+    curr = currBoard
+    lefts = leftBlk
+    placed = placedBlk
+    if isempty(lefts)
+        return true,curr,lefts,placed
+    end
+    for i in 1:ndims(lefts)
+        for j in -5:5
+            chk1,curr1,pos1 = placeBlock(curr,rotate(lefts[i],j))
+            if chk1
+                lefts1 = copy(lefts)
+                deleteat!(lefts1,i)
+                placed1 = cat(placed,pos1;dims=3)
+                chk2,curr2,lefts2,placed2 = enumFill(curr1,lefts1,placed1)
+                if chk2
+                    return true,curr2,lefts2,placed2
+                end
+            end
+        end
+    end
+    return false,curr,lefts,placed
+end
+function main()
+    blocks = [bk3,bk2,bk4,bk6,bk1,bk5,bk7,bk8,bk9]
+    board = markDateBoard()
+    placedBlocks = []
+    chk,curr,lefts,placed = enumFill(board,blocks,placedBlocks)
+    if chk
+        run(`clear`)
+        display(placed)
+    end
+end
+
+main()
 # display(rotate(bk1, -1))
-test = placeBlock(board,rotate(bk1, -1))
-display(test)
+# test = placeBlock(board,rotate(bk1, -1))
+# display(test)
