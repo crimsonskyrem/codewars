@@ -10,18 +10,18 @@ def intToRoman(num: int) -> str:
     else:
         return ""
 
-def subIntToRoman(num,devisor,one,five,ten) :
+def subIntToRoman(num,divisor,one,five,ten) :
     if num == 0:
         return ""
-    if num < 4 * devisor:
-        return one * (num // devisor)
-    elif num < 5 * devisor:
+    if num < 4 * divisor:
+        return one * (num // divisor)
+    elif num < 5 * divisor:
         return one + five
-    elif num < 6 * devisor:
+    elif num < 6 * divisor:
         return five
-    elif num < 9 * devisor:
-        return five + one * (num // devisor -5)
-    elif num < 10 * devisor:
+    elif num < 9 * divisor:
+        return five + one * (num // divisor -5)
+    elif num < 10 * divisor:
         return one + ten
 
 def test():
