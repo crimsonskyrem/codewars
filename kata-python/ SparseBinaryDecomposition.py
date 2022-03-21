@@ -1,30 +1,51 @@
+from math import ceil, log2
+
+
+def calculate_alternating_mask(value):
+    """
+    calculate_alternating_mask determines a binary mask with a maximum
+    range based on the provided value, then iterates through each bit in
+    the mask, alternating the setting of that bit to 0.
+
+    the end result is a mask with at most every other bit set to 1, in the
+    worst case scenario that all bits were 1 in the binary representation
+    of the input value.
+
+    @example: calculate_alternating_mask(15) -> 0b1010
+    @example: calculate_alternating_mask(0b1111) -> 0b1010
+    @example: calculate_alternating_mask(0xf) -> 0b1010
+
+    @example: calculate_alternating_mask(255) -> 0b10101010
+    @example: calculate_alternating_mask(0b11111111) -> 0b10101010
+    @example: calculate_alternating_mask(0xff) -> 0b10101010
+    """
+    binary_index = ceil(log2(value))
+    alternating_mask = 2 ** binary_index - 1
+
+    zero_bit = 1
+    while binary_index >= 0:
+        if (zero_bit == 1):
+            alternating_mask -= 2 ** binary_index
+
+        zero_bit ^= 0b1
+        binary_index -= 1
+
+    return alternating_mask
+
+
 def solution(N):
-    res = []
-    sparses = [False] * 3
-    for i in range(N // 2):
-        if checkSparse(i , sparses):
-            rest = N - i
-            if checkSparse(rest , sparses):
-                res.append(i)
-                res.append(rest)
-    if len(res) == 0:
-        return -1
-    return sorted(res)
+    """
+    solution will specially handle cases at the minimum range of valid
+    input values to return early. otherwise, an alternating mask will
+    be generated to calculate a sparse integer based on the value.
+    """
+    if N <= 2:
+        return N
 
-def checkSparse(N,sparses):
-    if N < len(sparses):
-        return sparses[N]
-    strN = bin(N)[2:]
-    tmp = int(strN[0])
-    for i in range(1,len(strN)):
-        i_int = int(strN[i])
-        if i_int & tmp == 1:
-            return False
-        else:
-            tmp = i_int
-    sparses.append(N)
-    return True
+    return N & calculate_alternating_mask(N)
 
 
-# print(solution(26) == [5,8,9,10,16,17,18,21])
-print(solution(1000000000))
+# print(solution(26) in [5, 8, 9, 10, 16, 17, 18, 21])
+print(solution(74901729))
+# print(solution(216188401))
+# print(solution(1000000000))
