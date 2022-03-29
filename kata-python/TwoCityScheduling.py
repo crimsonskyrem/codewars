@@ -1,5 +1,5 @@
 class Solution:
-    def twoCitySchedCost(self, costs) -> int:
+    def twoCitySchedCostFail(self, costs) -> int:
         diff = {}
         cityA = []
         cityB = []
@@ -22,6 +22,14 @@ class Solution:
             else:
                 cityB.append(diff[i][1])
         return sum(cityA) + sum(cityB)
+
+    def twoCitySchedCost(self,costs):
+        sum,length=0,len(costs)
+        num3=[[(costs[i][0]-costs[i][1]),i] for i in range (length)]
+        nums3= sorted(num3, key=lambda x:x[0])
+        for i in range (length//2):
+            sum+=costs[nums3[i][1]][0]+costs[nums3[i+(length//2)][1]][1]
+        return sum
 
 
 s = Solution()
